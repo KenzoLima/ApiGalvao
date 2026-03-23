@@ -1,13 +1,11 @@
-// 1. Importar Express
 const express = require('express');
 
-// 2. Criar aplicação
 const app = express();
 
 const { v4: uuidv4 } = require('uuid');
 const novoId = uuidv4();
 
-app.use(express.json()); // Middleware essencial - sempre adicionar no começo
+app.use(express.json());
 
 let produtos = [
     { id: 1, nome: "Les Paul", preco: 3500, categoria: "Guitarras", estoque: 6 },
@@ -71,4 +69,104 @@ app.get('/api/produtos/:d', (req, res) =>{
 });
 
 
-app.post
+app.post('/api/categorias', (req, res)=> {
+    const {nome} = req.body;
+
+    if (!nome){
+        return res.status(400)
+    }
+
+    const novaCategoria = {
+        id: uuidv4(),
+        nome: nome
+    };
+
+    categorias.push(novaCategoria);
+
+    res.status(201).json(novaCategoria);
+});
+
+app.post('/api/usuarios', (req, res) => {
+    const { nome, email } = req.body;
+
+    if (!nome || !email) {
+        return res.status(400)
+    }
+
+    const novoUsuario = {
+        id: uuidv4(),
+        nome: nome,
+        email: email
+    };
+
+    usuarios.push(novoUsuario);
+
+    res.status(201).json(novoUsuario);
+});
+
+app.post('/api/vendas', (req, res) => {
+    const { produtoId, quantidade } = req.body;
+
+    if (!produtoId || !quantidade) {
+        return res.status(400)
+    }
+
+    const produtoExiste = produtos.find(p => p.id === produtoId);
+
+    if(!produtoExiste) {
+        return res.status(404)
+    }
+
+    const novaVenda = {
+        id: uuidv4(),
+        produtoId,
+        quantidade,
+        data: new Date()
+    };
+
+    vendas.push(novaVenda);
+
+    res.status(201).json(novaVenda);
+});
+
+app.post('/api/produtos', (req, res) => {
+    const { nome, preco, categoria } = req.body;
+
+    if (!nome || !preco || !categoria) {
+        return res.status(400).json({
+            erro: "Preencha os campos obrigatórios! (Nome, Preço, CAtegoria)"
+        });
+    }
+    
+    if (typeof preco !== 'number') {
+        return res.status(400).json({
+            erro: "Preço deve ser um número"
+        });
+    }
+    
+    if (preco <= 0) {
+        return res.status(400).json({
+            erro: "Preço deve ser maior que zero"
+        });
+    }
+    
+    if (nome.length < 3) {
+        return res.status(400).json({
+            erro: "Nome deve ter pelo menos 3 caracteres"
+        });
+    }
+    
+
+    const novoProduto = {
+        id: uuidv4(),
+        nome,
+        preco,
+        categoria
+    };
+    
+    produtos.push(novoProduto);
+    
+    res.status(201).json(novoProduto);
+});
+
+app.listen(3000, () => console.log('API rodando na porta 3000'));
