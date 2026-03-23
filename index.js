@@ -1,12 +1,10 @@
 const express = require('express');
-
 const app = express();
-
 const { v4: uuidv4 } = require('uuid');
-const novoId = uuidv4();
 
 app.use(express.json());
 
+// --- BANCO DE DADOS (EM MEMÓRIA) ---
 let produtos = [
     { id: 1, nome: "Les Paul", preco: 3500, categoria: "Guitarras", estoque: 6 },
     { id: 2, nome: "Super Strato", preco: 2800, categoria: "Guitarras", estoque: 3 },
@@ -26,23 +24,25 @@ let usuarios = [
 
 let vendas = [];
 
+// --- ROTAS DE PRODUTOS ---
+
 app.get('/api/produtos', (req, res) => {
     const { categoria, preco_max, preco_min, ordem, direcao, pagina = 1, limite = 10 } = req.query;
-
-    let resultado = produtos;
+    let resultado = [...produtos];
 
     if (categoria) resultado = resultado.filter(p => p.categoria === categoria);
     if (preco_max) resultado = resultado.filter(p => p.preco <= parseFloat(preco_max));
     if (preco_min) resultado = resultado.filter(p => p.preco >= parseFloat(preco_min));
 
     if (ordem) {
-        resultado = resultado.sort((a, b) => {
+        resultado.sort((a, b) => {
             if (ordem === 'preco') {
                 return direcao === 'desc' ? b.preco - a.preco : a.preco - b.preco;
             }
             if (ordem === 'nome') {
                 return direcao === 'desc' ? b.nome.localeCompare(a.nome) : a.nome.localeCompare(b.nome);
             }
+            return 0;
         });
     }
 
@@ -62,59 +62,54 @@ app.get('/api/produtos', (req, res) => {
     });
 });
 
-app.get('/api/produtos/:d', (req, res) =>{
+app.get('/api/produtos/:id', (req, res) => {
     const produto = produtos.find(p => p.id == req.params.id);
-    if (!produto) return res.status(404).json({erro: "Produto não encontrado"});
+    if (!produto) return res.status(404).json({ erro: "Produto não encontrado" });
     res.json(produto);
 });
 
+app.post('/api/produtos', (req, res) => {
+    const { nome, preco, categoria } = req.body;
 
-app.post('/api/categorias', (req, res)=> {
-    const {nome} = req.body;
-
-    if (!nome){
-        return res.status(400)
+    if (!nome || preco === undefined || !categoria) {
+        return res.status(400).json({ erro: "Nome, preço e categoria são obrigatórios." });
     }
 
-    const novaCategoria = {
+    if (typeof preco !== 'number' || preco <= 0) {
+        return res.status(400).json({ erro: "O preço deve ser um número maior que zero." });
+    }
+
+    const produtoJaExiste = produtos.some(p => p.nome.toLowerCase() === nome.toLowerCase());
+    
+    if (produtoJaExiste) {
+        return res.status(409).json({ erro: "Este produto já está cadastrado." });
+    }
+
+    const novoProduto = {
         id: uuidv4(),
-        nome: nome
+        nome,
+        preco,
+        categoria
     };
 
-    categorias.push(novaCategoria);
-
-    res.status(201).json(novaCategoria);
+    produtos.push(novoProduto);
+    res.status(201).json(novoProduto);
 });
 
-app.post('/api/usuarios', (req, res) => {
-    const { nome, email } = req.body;
-
-    if (!nome || !email) {
-        return res.status(400)
-    }
-
-    const novoUsuario = {
-        id: uuidv4(),
-        nome: nome,
-        email: email
-    };
-
-    usuarios.push(novoUsuario);
-
-    res.status(201).json(novoUsuario);
+app.get('/api/vendas', (req, res) => {
+    res.json(vendas);
 });
 
 app.post('/api/vendas', (req, res) => {
     const { produtoId, quantidade } = req.body;
 
     if (!produtoId || !quantidade) {
-        return res.status(400)
+        return res.status(400).json({ erro: "produtoId e quantidade são obrigatórios" });
     }
 
     const produtoExiste = produtos.find(p => p.id === produtoId);
-
-    if(!produtoExiste) {
-        return res.status(404)
+    if (!produtoExiste) {
+        return res.status(404).json({ erro: "Produto não encontrado no estoque" });
     }
 
     const novaVenda = {
@@ -125,48 +120,25 @@ app.post('/api/vendas', (req, res) => {
     };
 
     vendas.push(novaVenda);
-
     res.status(201).json(novaVenda);
 });
 
-app.post('/api/produtos', (req, res) => {
-    const { nome, preco, categoria } = req.body;
+app.post('/api/usuarios', (req, res) => {
+    const { nome, email } = req.body;
+    if (!nome || !email) return res.status(400).json({ erro: "Nome e email obrigatórios" });
 
-    if (!nome || !preco || !categoria) {
-        return res.status(400).json({
-            erro: "Preencha os campos obrigatórios! (Nome, Preço, CAtegoria)"
-        });
-    }
-    
-    if (typeof preco !== 'number') {
-        return res.status(400).json({
-            erro: "Preço deve ser um número"
-        });
-    }
-    
-    if (preco <= 0) {
-        return res.status(400).json({
-            erro: "Preço deve ser maior que zero"
-        });
-    }
-    
-    if (nome.length < 3) {
-        return res.status(400).json({
-            erro: "Nome deve ter pelo menos 3 caracteres"
-        });
-    }
-    
+    const novoUsuario = { id: uuidv4(), nome, email };
+    usuarios.push(novoUsuario);
+    res.status(201).json(novoUsuario);
+});
 
-    const novoProduto = {
-        id: uuidv4(),
-        nome,
-        preco,
-        categoria
-    };
-    
-    produtos.push(novoProduto);
-    
-    res.status(201).json(novoProduto);
+app.post('/api/categorias', (req, res) => {
+    const { nome } = req.body;
+    if (!nome) return res.status(400).json({ erro: "Nome da categoria é obrigatório" });
+
+    const novaCategoria = { id: uuidv4(), nome };
+    categorias.push(novaCategoria);
+    res.status(201).json(novaCategoria);
 });
 
 app.listen(3000, () => console.log('API rodando na porta 3000'));
