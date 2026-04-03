@@ -4,8 +4,6 @@ const app = express();
 
 app.use(express.json());
 
-// --- ROTAS DA API ---
-
 // 1. LISTAR TODOS (GET)
 app.get('/api/produtos', async (req, res) => {
     try {
@@ -54,15 +52,48 @@ app.post('/api/produtos', async (req, res) => {
     }
 });
 
-// 4. DELETAR (DELETE)
+// 4. ATUALIZAR (PUT)
+app.put('/api/produtos/:id', async (req, res) => {
+    try {
+        const { nome, preco, categoria, estoque } = req.body;
+        const { id } = req.params;
+        const pool = await poolPromise;
+
+        const result = await pool.request()
+            .input('id', sql.Int, id)
+            .input('nome', sql.NVarChar, nome)
+            .input('preco', sql.Decimal(10, 2), preco)
+            .input('cat', sql.NVarChar, categoria)
+            .input('est', sql.Int, estoque)
+            .query(`
+                UPDATE Produtos 
+                SET nome = @nome, preco = @preco, categoria = @cat, estoque = @est 
+                WHERE id = @id
+            `);
+
+        if (result.rowsAffected[0] > 0) {
+            res.json({ mensagem: "Produto atualizado!" });
+        } else {
+            res.status(404).json({ erro: "Produto não encontrado" });
+        }
+    } catch (err) {
+        res.status(500).json({ erro: err.message });
+    }
+});
+
+// 5. DELETAR (DELETE)
 app.delete('/api/produtos/:id', async (req, res) => {
     try {
         const pool = await poolPromise;
-        await pool.request()
+        const result = await pool.request()
             .input('id', sql.Int, req.params.id)
             .query('DELETE FROM Produtos WHERE id = @id');
 
-        res.json({ mensagem: "Produto removido!" });
+        if (result.rowsAffected[0] > 0) {
+            res.json({ mensagem: "Produto removido com sucesso!" });
+        } else {
+            res.status(404).json({ erro: "Produto não encontrado" });
+        }
     } catch (err) {
         res.status(500).json({ erro: err.message });
     }
