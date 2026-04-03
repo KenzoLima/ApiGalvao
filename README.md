@@ -16,3 +16,12 @@ Teste de listagem geral:
 
 Teste de erro de tipagem:
 <img width="1919" height="1019" alt="image" src="https://github.com/user-attachments/assets/30d868b3-8818-4f95-8135-6f00a1fa4e2c" />
+
+Implementação do SQLServer:
+<img width="1919" height="1020" alt="image" src="https://github.com/user-attachments/assets/adc3e19e-b938-4853-86b7-c4dad81ffb09" />
+
+Update dos preços:
+<img width="635" height="171" alt="image" src="https://github.com/user-attachments/assets/22632b73-120e-48b2-9f68-5da6a537dfd3" />
+
+
+
