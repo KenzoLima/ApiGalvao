@@ -3,11 +3,11 @@ const sql = require('mssql');
 const config = {
     server: 'localhost',
     options: {
-        instanceName: 'SQLEXPRESS', // O segredo estava aqui!
+        instanceName: 'SQLEXPRESS', 
         trustedConnection: true,
         trustServerCertificate: true
     },
-    database: 'KenzoStore' // Nome do banco que você criou
+    database: 'KenzoStore'
 };
 
 const poolPromise = new sql.ConnectionPool(config)
