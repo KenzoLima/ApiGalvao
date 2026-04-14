@@ -1,28 +1,30 @@
 {
+  "name": "apigalvao",
+  "version": "1.0.0",
+  "description": "API de catálogo de produtos (Guitar Shop)!",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "dependencies": {
-    "better-sqlite3": "^12.8.0",
     "express": "^5.2.1",
+    "express-validator": "^7.0.0",
     "mssql": "^12.2.1",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
   },
-  "name": "apigalvao",
-  "version": "1.0.0",
-  "description": "API de catálogo de produtos!",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/KenzoLima/ApiGalvao.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["api", "rest", "guitarras"],
+  "author": "Kenzo Lima",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/KenzoLima/ApiGalvao/issues"
   },
