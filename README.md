@@ -1,18 +1,24 @@
-# 🎸 API Galvão - Catálogo de Produtos
+🚀 Endpoints Principais
+GET /api/kenzoguitars - Lista produtos (suporta paginação e filtros).
 
-Uma API RESTful desenvolvida em Node.js para gerenciamento de catálogo de produtos (focado em instrumentos musicais e acessórios). Este projeto implementa operações CRUD completas, com validação rigorosa de dados e persistência em banco de dados relacional.
+POST /api/kenzoguitars - Cadastra novo produto.
 
-## 🛠 Tecnologias Utilizadas
-- **Node.js** com **Express** (Framework Web)
-- **SQL Server** (Banco de dados relacional via pacote `mssql`)
-- **Express-Validator** (Sanitização e validação de payloads)
-- **Nodemon** (Ambiente de desenvolvimento)
+PUT /api/kenzoguitars/:id - Atualiza dados e estoques.
 
-## ⚙️ Pré-requisitos e Execução Local
+DELETE /api/kenzoguitars/:id - Remove produto.
+
+✅ Funcionalidades Testadas
+CRUD 100% Funcional.
+
+Validação de tipos e campos obrigatórios.
+
+Tratamento de erros de conexão com banco.
+
+Paginação e Ordenação na listage
 
 1. Clone o repositório:
    -bash
-   git clone [https://github.com/KenzoLima/ApiGalvao.git](https://github.com/KenzoLima/ApiGalvao.git)
+   git clone https://github.com/KenzoLima/ApiGalvao.git
    cd ApiGalvao
 
 2. Instale a dependências:
